@@ -66,7 +66,7 @@ import org.apache.beam.sdk.values.TypeDescriptors;
  * "wordcounts-00001-of-00005. When running on a distributed service, you would use an appropriate
  * file service.
  */
-public class MinimalWordCount {
+public class MinimalPageRankAdhikari {
 
   public static void main(String[] args) {
 
