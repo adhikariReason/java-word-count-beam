@@ -1,0 +1,12 @@
+[Go](go.md)
+- What is the total value of this 4-page web?
+- Group by key (page, value, list of outlinks)
+- All pages have at least one outgoing link. 
+- Begin by reading in each file to lines.
+Improve until the pages:
+- Start with the wordcount quickstart code.
+
+2B:
+
+- can start beyond column 1
+- All links start in column 1. 
