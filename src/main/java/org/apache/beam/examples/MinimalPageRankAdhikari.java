@@ -150,10 +150,6 @@ public class MinimalPageRankAdhikari {
             .via(
                 (String links) -> KV.of((String) fileName, (String) links)));
 
-    // PCollection<KV<String,String>> pColKVString =
-    // pColKVPairs.apply(MapElements.into(TypeDescriptors.strings())
-    // .via((PCollection<KV<String, String>> kvpairs) -> kvpairs.toString()));
-
     return pColKVPairs;
   }
 
