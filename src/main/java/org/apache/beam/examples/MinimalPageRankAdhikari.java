@@ -29,30 +29,47 @@ package org.apache.beam.examples;
 //     - Core Transforms
 
 import java.util.Arrays;
+
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+
 import org.apache.beam.sdk.Pipeline;
+import org.apache.beam.sdk.io.FileIO;
 import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.Filter;
 import org.apache.beam.sdk.transforms.FlatMapElements;
+import org.apache.beam.sdk.transforms.Flatten;
+import org.apache.beam.sdk.transforms.GroupByKey;
 import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.values.KV;
+import org.apache.beam.sdk.values.PCollection;
+import org.apache.beam.sdk.values.PCollectionList;
+import org.apache.beam.sdk.values.TypeDescriptor;
 import org.apache.beam.sdk.values.TypeDescriptors;
 
 /**
  * An example that counts words in Shakespeare.
  *
- * <p>This class, {@link MinimalWordCount}, is the first in a series of four successively more
- * detailed 'word count' examples. Here, for simplicity, we don't show any error-checking or
- * argument processing, and focus on construction of the pipeline, which chains together the
+ * <p>
+ * This class, {@link MinimalWordCount}, is the first in a series of four
+ * successively more
+ * detailed 'word count' examples. Here, for simplicity, we don't show any
+ * error-checking or
+ * argument processing, and focus on construction of the pipeline, which chains
+ * together the
  * application of core transforms.
  *
- * <p>Next, see the {@link WordCount} pipeline, then the {@link DebuggingWordCount}, and finally the
- * {@link WindowedWordCount} pipeline, for more detailed examples that introduce additional
+ * <p>
+ * Next, see the {@link WordCount} pipeline, then the
+ * {@link DebuggingWordCount}, and finally the
+ * {@link WindowedWordCount} pipeline, for more detailed examples that introduce
+ * additional
  * concepts.
  *
- * <p>Concepts:
+ * <p>
+ * Concepts:
  *
  * <pre>
  *   1. Reading data from text files
@@ -61,77 +78,90 @@ import org.apache.beam.sdk.values.TypeDescriptors;
  *   4. Writing data to text files
  * </pre>
  *
- * <p>No arguments are required to run this pipeline. It will be executed with the DirectRunner. You
- * can see the results in the output files in your current working directory, with names like
- * "wordcounts-00001-of-00005. When running on a distributed service, you would use an appropriate
+ * <p>
+ * No arguments are required to run this pipeline. It will be executed with the
+ * DirectRunner. You
+ * can see the results in the output files in your current working directory,
+ * with names like
+ * "wordcounts-00001-of-00005. When running on a distributed service, you would
+ * use an appropriate
  * file service.
  */
+
 public class MinimalPageRankAdhikari {
 
   public static void main(String[] args) {
-
     // Create a PipelineOptions object. This object lets us set various execution
     // options for our pipeline, such as the runner you wish to use. This example
     // will run with the DirectRunner by default, based on the class path configured
     // in its dependencies.
     PipelineOptions options = PipelineOptionsFactory.create();
 
-    // In order to run your pipeline, you need to make following runner specific changes:
-    //
-    // CHANGE 1/3: Select a Beam runner, such as BlockingDataflowRunner
-    // or FlinkRunner.
-    // CHANGE 2/3: Specify runner-required options.
-    // For BlockingDataflowRunner, set project and temp location as follows:
-    //   DataflowPipelineOptions dataflowOptions = options.as(DataflowPipelineOptions.class);
-    //   dataflowOptions.setRunner(BlockingDataflowRunner.class);
-    //   dataflowOptions.setProject("SET_YOUR_PROJECT_ID_HERE");
-    //   dataflowOptions.setTempLocation("gs://SET_YOUR_BUCKET_NAME_HERE/AND_TEMP_DIRECTORY");
-    // For FlinkRunner, set the runner as follows. See {@code FlinkPipelineOptions}
-    // for more details.
-    //   options.as(FlinkPipelineOptions.class)
-    //      .setRunner(FlinkRunner.class);
-
     // Create the Pipeline object with the options we defined above
     Pipeline p = Pipeline.create(options);
 
-    // Concept #1: Apply a root transform to the pipeline; in this case, TextIO.Read to read a set
-    // of input text files. TextIO.Read returns a PCollection where each element is one line from
-    // the input text (a set of Shakespeare's texts).
-
-    // This example reads from a public dataset containing the text of King Lear.
-
     // Initiating the variable for web04 and file name
     String folderName = "web04";
-    String fileName = "README.md";
+    // String fileName = "go.md";
 
-    p.apply(TextIO.read().from("./"+folderName+"/"+fileName))
+    //generating kv pairs for each webpage 
+    PCollection<KV<String, String>> pColKV1 = adhikariKVPairGenerator(p, folderName, "go.md");
+    PCollection<KV<String, String>> pColKV2 = adhikariKVPairGenerator(p, folderName, "java.md");
+    PCollection<KV<String, String>> pColKV3 = adhikariKVPairGenerator(p, folderName, "python.md");
+    PCollection<KV<String, String>> pColKV4 = adhikariKVPairGenerator(p, folderName, "README.md");
+    
+    //merging all kv pairs into one PCollectionList then PCollection
+    PCollectionList<KV<String, String>> pColKVList = PCollectionList.of(pColKV1).and(pColKV2).and(pColKV3).and(pColKV4);
+    PCollection<KV<String, String>> mergedList = pColKVList.apply(Flatten.<KV<String, String>>pCollections());
 
-        // Concept #2: Apply a FlatMapElements transform the PCollection of text lines.
-        // This transform splits the lines in PCollection<String>, where each element is an
-        // individual word in Shakespeare's collected texts.
-        //.apply(
-        //    FlatMapElements.into(TypeDescriptors.strings())
-        //        .via((String line) -> Arrays.asList(line.split("[^\\p{L}]+"))))
-        // We use a Filter transform to avoid empty word
-        //.apply(Filter.by((String word) -> !word.isEmpty()))
-        // Concept #3: Apply the Count transform to our PCollection of individual words. The Count
-        // transform returns a new PCollection of key/value pairs, where each key represents a
-        // unique word in the text. The associated value is the occurrence count for that word.
-        //.apply(Count.perElement())
-        // Apply a MapElements transform that formats our PCollection of word counts into a
-        // printable string, suitable for writing to an output file.
-        //.apply(
-        //    MapElements.into(TypeDescriptors.strings())
-        //        .via(
-        //            (KV<String, Long> wordCount) ->
-        //                wordCount.getKey() + ": " + wordCount.getValue()))
-        // Concept #4: Apply a write transform, TextIO.Write, at the end of the pipeline.
-        // TextIO.Write writes the contents of a PCollection (in this case, our PCollection of
-        // formatted strings) to a series of text files.
-        //
-        // By default, it will write to a set of files with names like wordcounts-00001-of-00005
-        .apply(TextIO.write().to("adhikariOutput"));
+    PCollection<KV<String, Iterable<String>>> pColReduced =
+     mergedList.apply(GroupByKey.<String, String>create());
 
+
+    //Changing to be able to write using TextIO
+    PCollection<String> writableFile = pColReduced.apply(MapElements.into(TypeDescriptors.strings())
+        .via((kvpairs) -> kvpairs.toString()));
+
+    //writing the result
+    writableFile.apply(TextIO.write().to("AdhikariPR"));
     p.run().waitUntilFinish();
+  }
+
+  public static PCollection<KV<String, String>> adhikariKVPairGenerator(Pipeline p, String folderName, String fileName) {
+
+    String dataPath = "./" + folderName + "/" + fileName;
+    PCollection<String> pColLine = p.apply(TextIO.read().from(dataPath));
+
+    // .apply(Filter.by((String line) -> !line.isEmpty()))
+    // .apply(Filter.by((String line) -> !line.contentEquals(" ")))
+
+    PCollection<String> pColLinkLine = pColLine.apply(Filter.by((String linkline) -> linkline.startsWith("[")))
+        .apply(
+            MapElements.into(TypeDescriptors.strings())
+                .via((String linkline) -> linkline.strip()));
+
+    PCollection<String> pColLinks = pColLinkLine.apply(
+        MapElements.into(TypeDescriptors.strings())
+            .via((String linkword) -> (findLink(linkword))));
+
+    PCollection<KV<String, String>> pColKVPairs = pColLinks.apply(
+        MapElements.into(TypeDescriptors.kvs(TypeDescriptors.strings(),
+            TypeDescriptors.strings()))
+            .via(
+                (String links) -> KV.of((String) fileName, (String) links)));
+
+    // PCollection<KV<String,String>> pColKVString =
+    // pColKVPairs.apply(MapElements.into(TypeDescriptors.strings())
+    // .via((PCollection<KV<String, String>> kvpairs) -> kvpairs.toString()));
+
+    return pColKVPairs;
+  }
+
+  public static String findLink(String line) {
+    String link = "";
+    int beginIndex = line.indexOf("(");
+    int endIndex = line.indexOf(")");
+    link = line.substring(beginIndex + 1, endIndex);
+    return link;
   }
 }

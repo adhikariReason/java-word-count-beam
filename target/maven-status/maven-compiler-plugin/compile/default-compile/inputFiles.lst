@@ -4,6 +4,7 @@ C:\Users\s538259\Documents\44517\java-word-count-beam\src\main\java\org\apache\b
 C:\Users\s538259\Documents\44517\java-word-count-beam\src\main\java\org\apache\beam\examples\complete\game\utils\WriteWindowedToBigQuery.java
 C:\Users\s538259\Documents\44517\java-word-count-beam\src\main\java\org\apache\beam\examples\WordCount.java
 C:\Users\s538259\Documents\44517\java-word-count-beam\src\main\java\org\apache\beam\examples\common\ExamplePubsubTopicOptions.java
+C:\Users\s538259\Documents\44517\java-word-count-beam\src\main\java\org\apache\beam\examples\MinimalPageRankAdhikari.java
 C:\Users\s538259\Documents\44517\java-word-count-beam\src\main\java\org\apache\beam\examples\common\ExamplePubsubTopicAndSubscriptionOptions.java
 C:\Users\s538259\Documents\44517\java-word-count-beam\src\main\java\org\apache\beam\examples\subprocess\ExampleEchoPipeline.java
 C:\Users\s538259\Documents\44517\java-word-count-beam\src\main\java\org\apache\beam\examples\complete\game\GameStats.java
@@ -21,7 +22,6 @@ C:\Users\s538259\Documents\44517\java-word-count-beam\src\main\java\org\apache\b
 C:\Users\s538259\Documents\44517\java-word-count-beam\src\main\java\org\apache\beam\examples\subprocess\utils\ExecutableFile.java
 C:\Users\s538259\Documents\44517\java-word-count-beam\src\main\java\org\apache\beam\examples\complete\game\utils\GameConstants.java
 C:\Users\s538259\Documents\44517\java-word-count-beam\src\main\java\org\apache\beam\examples\complete\game\utils\WriteToBigQuery.java
-C:\Users\s538259\Documents\44517\java-word-count-beam\src\main\java\org\apache\beam\examples\MinimalWordCount.java
 C:\Users\s538259\Documents\44517\java-word-count-beam\src\main\java\org\apache\beam\examples\subprocess\SubProcessPipelineOptions.java
 C:\Users\s538259\Documents\44517\java-word-count-beam\src\main\java\org\apache\beam\examples\common\ExampleBigQueryTableOptions.java
 C:\Users\s538259\Documents\44517\java-word-count-beam\src\main\java\org\apache\beam\examples\common\ExampleUtils.java
